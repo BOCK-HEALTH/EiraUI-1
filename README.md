@@ -1,4 +1,4 @@
-# 🧠 Eira 0.1 – Your AI Health Assistant
+# 🧠 Eira 1 – Your AI Health Assistant
 
 **Eira** is an intelligent chatbot-based health assistant designed to provide medical guidance, symptom analysis, and wellness recommendations. It supports video and voice inputs, and maintains personalized chat sessions per user. Built using React, Node.js, Firebase, and PostgreSQL (Neon DB).
 
