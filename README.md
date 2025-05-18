@@ -32,7 +32,7 @@
 - Express.js
 - Firebase (for Google Auth)
 - PostgreSQL (Neon DB)
-- Multer (for handling video uploads)
+
 
 ---
 
