@@ -1,95 +1,114 @@
-// src/components/Sidebar.js
-import React, { useEffect, useState } from "react";
-import "./Sidebar.css";
+"use client"
 
-function Sidebar({ onSelectSession, onNewSession }) {
-  const [sessions, setSessions] = useState([]);
-  const [editingId, setEditingId] = useState(null);
-  const [editedTitle, setEditedTitle] = useState("");
-  const email = localStorage.getItem("userEmail");
+import { useState, useEffect } from "react"
+import { FiPlus, FiUser, FiLogOut } from "react-icons/fi"
+import "./Sidebar.css"
+
+// Export the Sidebar component before defining it
+const Sidebar = ({ onNewSession, onSelectSession, className = "" }) => {
+  const [sessions, setSessions] = useState([])
+  const [userEmail, setUserEmail] = useState("")
+  const [userName, setUserName] = useState("")
 
   useEffect(() => {
-    fetchSessions();
-  }, []);
+    // Get user info from localStorage
+    const email = localStorage.getItem("userEmail") || ""
+    const name = localStorage.getItem("userName") || ""
 
-  const fetchSessions = async () => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/sessions/list?email=${email}`);
-      const data = await res.json();
-      setSessions(data);
-    } catch (err) {
-      console.error("Failed to fetch sessions:", err);
-    }
-  };
+    setUserEmail(email)
+    setUserName(name)
 
-  const handleRename = async (id) => {
-    try {
-      await fetch("http://localhost:5000/api/sessions/rename", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: id, newTitle: editedTitle })
-      });
-      setEditingId(null);
-      setEditedTitle("");
-      await fetchSessions();
-    } catch (err) {
-      console.error("Rename failed:", err);
+    if (email) {
+      loadUserSessions(email)
     }
-  };
+  }, [])
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this session?")) return;
+  const loadUserSessions = async (email) => {
     try {
-      await fetch(`http://localhost:5000/api/sessions/${id}`, { method: "DELETE" });
-      await fetchSessions();
+      const res = await fetch(`http://localhost:5000/api/sessions/list?email=${email}`)
+      if (res.ok) {
+        const data = await res.json()
+        setSessions(data)
+      }
     } catch (err) {
-      console.error("Delete failed:", err);
+      console.error("Failed to load sessions:", err)
     }
-  };
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail")
+    localStorage.removeItem("userName")
+    localStorage.removeItem("lastSessionId")
+    window.location.href = "/login"
+  }
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now - date)
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) {
+      return "Today"
+    } else if (diffDays === 1) {
+      return "Yesterday"
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`
+    } else {
+      return date.toLocaleDateString()
+    }
+  }
 
   return (
-    <div className="sidebar">
-      <h3>Sessions</h3>
-      <button
-        className="new-session"
-        onClick={async () => {
-          const newId = await onNewSession();
-          if (newId) {
-            await fetchSessions();
-            onSelectSession(newId);
-          }
-        }}
-      >
-        + New Chat
-      </button>
+    <div className={`sidebar ${className}`}>
+      <div className="user-profile-section">
+        <div className="user-avatar">
+          <FiUser size={24} />
+        </div>
+        <div className="user-info">
+          <div className="user-name">{userName || "User"}</div>
+          <div className="user-email">{userEmail}</div>
+        </div>
+      </div>
 
-      <ul>
-        {sessions.map(s => (
-          <li key={s.id}>
-            {editingId === s.id ? (
-              <div className="edit-session">
-                <input
-                  value={editedTitle}
-                  onChange={e => setEditedTitle(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleRename(s.id)}
-                />
-                <button className="action-btn">✔</button>
-                <button className="action-btn" onClick={() => setEditingId(null)}>✖</button>
-              </div>
-            ) : (
-              <div className="session-item">
-                <span onClick={() => onSelectSession(s.id)}>{s.title}</span>
-                <div className="session-actions">
-                  <button className="action-btn" onClick={() => { setEditingId(s.id); setEditedTitle(s.title); }}>✏️</button>
-                  <button className="action-btn" onClick={() => handleDelete(s.id)}>🗑️</button>
-                </div>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+      {/* New Session Button */}
+      <div className="sidebar-header">
+        <button onClick={onNewSession} className="new-session-btn">
+          <FiPlus size={18} />
+          <span>New Session</span>
+        </button>
+      </div>
+
+      {/* Sessions List */}
+      <div className="sessions-list">
+        <div className="sessions-header">
+          <h3>Recent Sessions</h3>
+        </div>
+        {sessions.length > 0 ? (
+          sessions.map((session) => (
+            <div key={session.id} className="session-item" onClick={() => onSelectSession(session.id)}>
+              <div className="session-title">{session.title}</div>
+              <div className="session-date">{formatDate(session.created_at)}</div>
+            </div>
+          ))
+        ) : (
+          <div className="no-sessions">
+            <p>No sessions yet</p>
+            <p>Start a new conversation to begin</p>
+          </div>
+        )}
+      </div>
+
+      {/* Logout Button */}
+      <div className="sidebar-footer">
+        <button onClick={handleLogout} className="logout-btn">
+          <FiLogOut size={18} />
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
-  );
+  )
 }
 
-export default Sidebar;
+// Export the component at the end
+export default Sidebar
