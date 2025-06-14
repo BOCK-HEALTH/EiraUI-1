@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react"
 import "./App.css"
 import logo from "./Eira Text2-01.svg"
-import { FiVideo, FiMic, FiPlus, FiFile, FiImage, FiFileText, FiMusic, FiX, FiDownload, FiUser } from "react-icons/fi"
+import { FiVideo, FiMic, FiPlus, FiFile, FiImage, FiFileText, FiMusic, FiX, FiDownload, FiMenu } from "react-icons/fi"
 import Sidebar from "./components/Sidebar"
+import UserMenu from "./components/UserMenu"
 
 // Update the App component to properly handle sidebar state
 function App() {
@@ -54,6 +55,12 @@ function App() {
         setMessages([])
         setHasActiveChat(true)
         localStorage.setItem("lastSessionId", data.id)
+
+        // Trigger sidebar refresh by calling a callback if provided
+        if (window.refreshSidebar) {
+          window.refreshSidebar()
+        }
+
         return data.id
       }
     } catch (err) {
@@ -568,19 +575,46 @@ function App() {
     }
   }, [audioStream])
 
-  // Update the return statement to fix the layout issues
+  // Add this useEffect after the existing useEffects, around line 200
+  useEffect(() => {
+    // Add or remove class to body based on sidebar state
+    if (showSidebar) {
+      document.body.classList.add("sidebar-open")
+    } else {
+      document.body.classList.remove("sidebar-open")
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove("sidebar-open")
+    }
+  }, [showSidebar])
+
+  // Update the return statement to include the new header layout
   return (
-    <div className="app-layout">
-      {/* User menu button that toggles the sidebar */}
-      <div className="user-menu-button" onClick={() => setShowSidebar(!showSidebar)}>
-        <FiUser size={24} />
+    <div className={`app-layout ${showSidebar ? "sidebar-is-open" : ""}`}>
+      {/* Header with sidebar toggle and user menu */}
+      <div className="app-header">
+        <button className="sidebar-toggle-btn" onClick={() => setShowSidebar(!showSidebar)}>
+          <FiMenu size={20} />
+        </button>
+        <UserMenu />
       </div>
 
-      {/* Always render Sidebar with proper visibility state */}
+      {/* Sidebar */}
       <Sidebar
         onNewSession={createNewSession}
         onSelectSession={loadSessionMessages}
         className={showSidebar ? "open" : "collapsed"}
+        onSessionDeleted={() => {
+          // Clear current chat if the deleted session was active
+          const currentSessionId = localStorage.getItem("lastSessionId")
+          if (!currentSessionId) {
+            setMessages([])
+            setHasActiveChat(false)
+            setSessionId(null)
+          }
+        }}
       />
 
       <div className={`app-container ${!showSidebar ? "sidebar-collapsed" : ""}`}>
