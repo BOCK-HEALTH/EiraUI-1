@@ -30,6 +30,7 @@
   left: -280px; /* Start off-screen by default */
   z-index: 1000;
   transition: left 0.3s ease;
+  padding-top: 80px; /* Account for header height */
 }
 
 /* When sidebar has open class, show it */
@@ -42,56 +43,13 @@
   left: -280px;
 }
 
-/* User Profile Section */
-.user-profile-section {
-  padding: 20px 16px;
-  padding-top: 70px; /* Add extra padding at the top */
-  border-bottom: 1px solid #e9ecef;
-  background: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--eira-yellow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  flex-shrink: 0;
-}
-
-.user-info {
-  flex: 1;
-  min-width: 0;
-}
-
-.user-name {
-  font-weight: 600;
-  font-size: 14px;
-  color: #2d3748;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: 4px;
-}
-
-.user-email {
-  font-size: 12px;
-  color: #718096;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Sidebar Header */
+/* Sidebar Header - Make sure it's visible */
 .sidebar-header {
   padding: 16px;
   border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+  position: relative;
+  z-index: 5;
 }
 
 .new-session-btn {
@@ -108,6 +66,7 @@
   justify-content: center;
   gap: 8px;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(253, 184, 33, 0.3);
 }
 
 .new-session-btn:hover {
@@ -125,31 +84,126 @@
 
 .sessions-header {
   margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4a5568;
 }
 
 .sessions-header h3 {
   font-size: 14px;
   font-weight: 600;
-  color: #4a5568;
   margin: 0;
 }
 
 .session-item {
-  padding: 12px;
   border-radius: 8px;
-  cursor: pointer;
   margin-bottom: 8px;
   transition: all 0.2s ease;
   border: 1px solid transparent;
+  overflow: hidden;
 }
 
-.session-item:hover {
+.session-content {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+}
+
+.session-content:hover {
   background: #edf2f7;
   border-color: #e2e8f0;
 }
 
-.session-item:active {
+.session-content:active {
   background: #e2e8f0;
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  margin-left: 8px;
+}
+
+.session-item:hover .session-actions {
+  opacity: 1;
+}
+
+.session-action-btn {
+  background: none;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #718096;
+}
+
+.session-action-btn:hover {
+  background: #e2e8f0;
+}
+
+.edit-btn:hover {
+  color: #3182ce;
+  background: #ebf8ff;
+}
+
+.delete-btn:hover {
+  color: #e53e3e;
+  background: #fed7d7;
+}
+
+.session-edit-mode {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7fafc;
+}
+
+.session-edit-input {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2d3748;
+  background: white;
+  outline: none;
+}
+
+.session-edit-input:focus {
+  border-color: var(--eira-yellow);
+  box-shadow: 0 0 0 1px var(--eira-yellow);
+}
+
+.session-edit-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.save-btn:hover {
+  color: #38a169;
+  background: #c6f6d5;
+}
+
+.cancel-btn:hover {
+  color: #e53e3e;
+  background: #fed7d7;
 }
 
 .session-title {
@@ -160,6 +214,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 180px;
 }
 
 .session-date {
@@ -181,38 +236,6 @@
 .no-sessions p:first-child {
   font-weight: 500;
   color: #718096;
-}
-
-/* Sidebar Footer */
-.sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid #e9ecef;
-  background: #ffffff;
-}
-
-.logout-btn {
-  width: 100%;
-  background: #fff5f5;
-  color: #e53e3e;
-  border: 1px solid #fed7d7;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-
-.logout-btn:hover {
-  background: #fff5f5;
-  border-color: #e53e3e;
-}
-
-.logout-btn:active {
-  background: #fed7d7;
 }
 
 /* Scrollbar Styling */
@@ -245,17 +268,5 @@
 
   .sidebar.open {
     transform: translateX(0);
-  }
-
-  .user-profile-section {
-    padding: 16px 12px;
-  }
-
-  .user-name {
-    font-size: 13px;
-  }
-
-  .user-email {
-    font-size: 11px;
   }
 }
