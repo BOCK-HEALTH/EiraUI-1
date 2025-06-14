@@ -37,23 +37,29 @@ body {
 /* Main Layout */
 .app-layout {
   display: flex;
+  flex-direction: column;
   height: 100vh;
   position: relative;
 }
 
-/* Sidebar Toggle Button */
-.sidebar-toggle-container {
+/* Update the app header styles to ensure proper spacing */
+.app-header {
   position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1001;
-  transition: left 0.3s ease;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: var(--eira-background);
+  border-bottom: 1px solid var(--eira-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1002;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.app-container.sidebar-collapsed .sidebar-toggle-container {
-  left: 20px;
-}
-
+/* Ensure the sidebar toggle button is visible */
 .sidebar-toggle-btn {
   background: var(--eira-yellow);
   border: none;
@@ -66,6 +72,7 @@ body {
   justify-content: center;
   box-shadow: var(--eira-shadow);
   transition: all 0.2s ease;
+  z-index: 10;
 }
 
 .sidebar-toggle-btn:hover {
@@ -91,6 +98,7 @@ body {
   left: -280px; /* Start off-screen by default */
   z-index: 1000;
   transition: left 0.3s ease;
+  padding-top: 80px; /* Account for header height */
 }
 
 /* When sidebar has open class, show it */
@@ -179,65 +187,6 @@ body {
   color: white;
 }
 
-/* Sidebar Collapsed State */
-.sidebar.collapsed {
-  width: 60px;
-  padding: 20px 10px;
-  transition: width 0.3s ease;
-}
-
-.sidebar-collapsed-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100%;
-}
-
-.collapsed-sessions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 60px; /* Space for toggle button */
-}
-
-.collapsed-session-item {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  background: var(--eira-hover);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  position: relative;
-}
-
-.collapsed-session-item:hover {
-  background: var(--eira-yellow-light);
-  transform: translateX(2px);
-}
-
-.collapsed-session-item.active {
-  background: var(--eira-yellow);
-}
-
-.session-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--eira-text-secondary);
-  transition: all 0.2s ease;
-}
-
-.collapsed-session-item.active .session-indicator {
-  background: white;
-}
-
-.collapsed-session-item:hover .session-indicator {
-  background: var(--eira-yellow-hover);
-}
-
 /* Update the app container to properly adjust when sidebar is visible */
 .app-container {
   flex: 1;
@@ -246,11 +195,13 @@ body {
   transition: margin-left 0.3s ease;
   position: relative;
   margin-left: 0;
+  margin-top: 60px;
 }
 
 /* When sidebar is open, add proper margin to the app container */
-.app-layout:has(.sidebar.open) .app-container {
-  margin-left: 280px; /* Match the sidebar width */
+body.sidebar-open .app-container,
+.app-layout.sidebar-is-open .app-container {
+  margin-left: 280px;
 }
 
 /* App Content Area with sidebar collapsed */
@@ -265,7 +216,7 @@ body {
   scroll-behavior: smooth;
   padding-bottom: 200px;
   position: relative;
-  height: 100vh;
+  height: calc(100vh - 60px); /* Account for header */
 }
 
 /* Welcome Section */
@@ -274,7 +225,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 200px);
+  min-height: calc(100vh - 260px); /* Account for header and input */
   padding: 40px 20px;
   margin: 0 auto;
 }
@@ -796,28 +747,67 @@ body {
   }
 }
 
-/* Update the CSS for the input container to align with the content */
-
-/* Gemini-style Input Container - NEW APPROACH */
+/* Gemini-style Input Container */
 .gemini-input-container {
   position: fixed;
   bottom: 20px;
-  width: 100%;
+  left: 20px;
+  right: 20px;
+  width: auto;
   max-width: 800px;
   z-index: 1000;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
+  transition: all 0.3s ease;
+  margin: 0 auto;
 }
 
-/* Remove all sidebar-specific positioning */
+/* When sidebar is open on desktop, adjust the input container */
+@media (min-width: 769px) {
+  body.sidebar-open .gemini-input-container,
+  .app-layout.sidebar-is-open .gemini-input-container {
+    left: 300px; /* 280px sidebar + 20px margin */
+    right: 20px;
+    /* By removing the incorrect 'max-width' and 'margin' overrides,
+       the input container will inherit the centering behavior ('margin: 0 auto')
+       from its base class and correctly position itself within the new boundaries. */
+  }
+}
 
-/* For mobile devices */
+/* For mobile and tablet devices - keep input properly positioned */
 @media (max-width: 768px) {
   .gemini-input-container {
-    width: calc(100% - 20px);
-    max-width: 100%;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* On mobile, don't adjust for sidebar since it overlays */
+  body.sidebar-open .gemini-input-container,
+  .app-layout.sidebar-is-open .gemini-input-container {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* For very small screens */
+@media (max-width: 480px) {
+  .gemini-input-container {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+  }
+
+  body.sidebar-open .gemini-input-container,
+  .app-layout.sidebar-is-open .gemini-input-container {
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
   }
 }
 
@@ -1144,25 +1134,24 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-  :root {
-    --sidebar-width: 0px;
-  }
-
-  .gemini-input-container {
-    left: 20px;
-    right: 20px;
-  }
-
   .sidebar {
     position: fixed;
     left: -280px;
-    z-index: 100;
+    z-index: 1001;
     transition: left 0.3s ease;
     width: 280px;
   }
 
   .sidebar.open {
     left: 0;
+  }
+
+  .sidebar.collapsed {
+    left: -280px;
+  }
+
+  .app-container.sidebar-collapsed {
+    margin-left: 0;
   }
 
   .file-viewer-modal {
@@ -1174,26 +1163,13 @@ body {
     width: 90vw;
     height: 60vh;
   }
-
-  /* Responsive adjustments for collapsed sidebar */
-  .sidebar.collapsed {
-    left: -280px;
-  }
-
-  .app-container.sidebar-collapsed {
-    margin-left: 0;
-  }
-
-  .gemini-input-container.sidebar-collapsed {
-    left: 20px;
-  }
-
-  .sidebar-toggle-container {
-    left: 20px;
-  }
 }
 
 @media (max-width: 768px) {
+  .app-header {
+    padding: 0 15px;
+  }
+
   .capabilities {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -1362,230 +1338,4 @@ body {
 .action-button-large[class*="upload"],
 button[class*="upload"] {
   display: none !important;
-}
-
-/* Update CSS custom property for collapsed state */
-.app-layout:has(.sidebar.collapsed) {
-  --sidebar-width: 60px;
-}
-
-/* Tooltip for collapsed session items */
-.collapsed-session-item::after {
-  content: attr(title);
-  position: absolute;
-  left: 50px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--eira-text);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 1000;
-}
-
-.collapsed-session-item:hover::after {
-  opacity: 1;
-}
-
-/* Animation for sidebar transition */
-.sidebar {
-  transition: width 0.3s ease, padding 0.3s ease;
-}
-
-.sidebar h3,
-.sidebar .new-session,
-.sidebar ul {
-  transition: opacity 0.2s ease;
-}
-
-.sidebar.collapsed h3,
-.sidebar.collapsed .new-session,
-.sidebar.collapsed ul {
-  opacity: 0;
-  pointer-events: none;
-}
-.app-header {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.user-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: background-color 0.2s;
-}
-
-.user-button:hover {
-  background-color: #e9ecef;
-}
-
-.user-avatar {
-  width: 32px;
-  height: 32px;
-  background-color: #4a6fa5;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.header-logo {
-  height: 30px;
-  margin-left: 15px;
-}
-
-/* Adjust the layout to account for the header */
-.app-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
-.chat-container {
-  flex: 1;
-  overflow-y: auto;
-  padding-top: 0;
-}
-
-/* Add these styles for the user menu button */
-.user-menu-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1002; /* Higher than sidebar */
-  background: #fff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-/* Update the user menu button position to work better with the sidebar */
-.user-menu-button {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1002; /* Higher than sidebar */
-  background: #fff;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-/* Fix the app-container to properly adjust when sidebar is visible */
-.app-container {
-  flex: 1;
-  height: 100vh;
-  overflow: hidden;
-  transition: margin-left 0.3s ease;
-  position: relative;
-}
-
-/* When sidebar is visible, add proper margin to the app container */
-.app-layout:has(.sidebar) .app-container:not(.sidebar-collapsed) {
-  margin-left: 280px; /* Match the sidebar width */
-}
-
-/* Fix the gemini-input-container positioning */
-.gemini-input-container {
-  position: fixed;
-  bottom: 20px;
-  left: 0;
-  right: 0;
-  width: calc(100% - 40px);
-  max-width: 800px;
-  z-index: 1000;
-  margin: 0 auto;
-  transition: all 0.3s ease;
-}
-
-/* Remove the transform that was causing misalignment */
-.app-layout:has(.sidebar) .gemini-input-container:not(.sidebar-collapsed) {
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  transform: none;
-}
-
-/* Adjust the input container when sidebar is visible */
-.app-layout:has(.sidebar.open) .gemini-input-container {
-  width: calc(100% - 40px);
-  max-width: 800px;
-  margin: 0 auto;
-  left: 140px; /* Half of sidebar width to maintain centering */
-}
-
-/* For mobile devices, ensure the input is properly centered */
-@media (max-width: 768px) {
-  .gemini-input-container,
-  .app-layout:has(.sidebar.open) .gemini-input-container {
-    left: 0;
-    right: 0;
-    width: calc(100% - 20px);
-    margin: 0 auto;
-  }
-}
-
-/* Fix the chat container to properly adjust with sidebar */
-.chat-container {
-  flex: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  padding-bottom: 200px;
-  position: relative;
-  height: 100vh;
-}
-
-/* Remove the top padding that was causing layout issues */
-.app-container {
-  padding-top: 0;
-}
-
-/* Ensure the welcome container is properly centered */
-.welcome-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 200px);
-  padding: 40px 20px;
-  margin: 0 auto;
-}
-
-/* Adjust the user menu button when sidebar is visible */
-.app-layout:has(.sidebar:not(.collapsed)) .user-menu-button {
-  left: calc(var(--sidebar-width) + 20px);
-}
-
-/* When sidebar is visible, add margin to the app container */
-.app-layout:has(.sidebar:not(.collapsed)) .app-container {
-  margin-left: var(--sidebar-width);
-}
-
-/* When sidebar is visible, adjust the input container */
-.app-layout:has(.sidebar:not(.collapsed)) .gemini-input-container {
-  left: calc(50% + var(--sidebar-width) / 2);
 }
