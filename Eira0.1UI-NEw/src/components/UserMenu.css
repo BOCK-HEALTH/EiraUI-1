@@ -1,5 +1,26 @@
 /* UserMenu.css */
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --eira-yellow: #fdb821;
+  --eira-yellow-light: #fff8e6;
+  --eira-yellow-hover: #e6a109;
+  --eira-text: #343541;
+  --eira-text-secondary: #6e6e80;
+  --eira-background: #ffffff;
+  --eira-sidebar-bg: #f7f7f8;
+  --eira-border: #e5e5e5;
+  --eira-user-bg: #f7f7f8;
+  --eira-bot-bg: #ffffff;
+  --eira-hover: #f9f9f9;
+  --eira-red: #ff5c5c;
+  --eira-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --eira-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --sidebar-width: 280px;
+}
+
+
 .user-menu {
   position: relative;
   z-index: 1001;
@@ -141,6 +162,7 @@
   color: #4a5568;
 }
 
+/* Name editing styles */
 .name-edit-container {
   display: flex;
   align-items: center;
@@ -202,7 +224,7 @@
 }
 
 .cancel-btn:hover:not(:disabled) {
-  color: #e53e3e;
+  color:  var(--eira-yellow-hover);
   background: #fed7d7;
 }
 
@@ -237,12 +259,12 @@
 }
 
 .logout-item {
-  color: #e53e3e;
+  color: var(--eira-yellow);
 }
 
 .logout-item:hover {
-  background: #fed7d7;
-  color: #c53030;
+  background:  var(--eira-yellow-hover);
+  color:  var(--eira-yellow-light);
 }
 
 /* 
