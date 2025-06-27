@@ -1,50 +1,57 @@
+"use client"
+
 // src/Login.js
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./firebase";
-import logo from "./Eira Text2-01.svg";
-import "./Login.css";
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import logo from "./Eira Text2-01.svg"
+import "./Login.css"
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
-  const [isRegister, setIsRegister] = useState(false);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [password, setPassword] = useState("")
+  const [isRegister, setIsRegister] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
 
   const handleAuth = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    setLoading(true)
 
     try {
-      if (isRegister) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
+      const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login"
+      const body = isRegister ? { email, password, name } : { email, password }
 
-      // ✅ Send user info to backend
-      await fetch("http://localhost:5000/api/users/get-or-create", {
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, name }),
-      });
+        body: JSON.stringify(body),
+      })
 
-      // ✅ Save info locally
-      localStorage.setItem("userEmail", email);
-      localStorage.setItem("userName", name);
+      const data = await response.json()
 
-      navigate("/app");
+      if (data.success) {
+        // ✅ Save user info locally
+        localStorage.setItem("userEmail", data.user.email)
+        localStorage.setItem("userName", data.user.name || name)
+        localStorage.setItem("userUid", data.user.uid)
+
+        navigate("/app")
+      } else {
+        alert(data.error || "Authentication failed")
+      }
     } catch (err) {
-        console.error("Auth error:", err);
-      alert(err.message);
+      console.error("Auth error:", err)
+      alert("Network error. Please try again.")
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div className="login-page">
       <div className="login-card">
-        <img src={logo} alt="Eira Logo" className="login-logo" />
+        <img src={logo || "/placeholder.svg"} alt="Eira Logo" className="login-logo" />
         <h2>{isRegister ? "Register" : "Login"}</h2>
         <form onSubmit={handleAuth}>
           <input
@@ -53,6 +60,7 @@ function Login() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
           {isRegister && (
             <input
@@ -61,6 +69,7 @@ function Login() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
+              disabled={loading}
             />
           )}
           <input
@@ -69,17 +78,18 @@ function Login() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
-          <button type="submit">
-            {isRegister ? "Create Account" : "Login"}
+          <button type="submit" disabled={loading}>
+            {loading ? "Processing..." : isRegister ? "Create Account" : "Login"}
           </button>
         </form>
-        <p onClick={() => setIsRegister(!isRegister)}>
+        <p onClick={() => !loading && setIsRegister(!isRegister)}>
           {isRegister ? "Already have an account? Login" : "Don't have an account? Register"}
         </p>
       </div>
     </div>
-  );
+  )
 }
 
-export default Login;
+export default Login
