@@ -40,11 +40,6 @@
 
 ```
 Eira/
-├── backend/               # Node.js Express server
-│   ├── routes/
-│   ├── controllers/
-│   ├── db/
-│   └── index.js
 ├── src/                   # React frontend
 │   ├── components/
 │   │   ├── Sidebar.js
@@ -69,13 +64,9 @@ Eira/
 ### 1. Clone the Repo
 ```bash
 git clone https://github.com/your-username/eira-ai.git
-cd eira-ai
 ```
 
 ### 2. Install Dependencies
-```bash
-cd backend
-npm install
 
 cd ../frontend
 npm install
@@ -115,11 +106,7 @@ const firebaseConfig = {
 
 ### 4. Start the Servers
 
-#### Backend:
-```bash
-cd backend
-node index.js
-```
+
 
 #### Frontend:
 ```bash
